@@ -1,0 +1,25 @@
+# HTTP Settings
+# How the checker makes requests to web servers
+[http]
+timeout_seconds = 30
+max_redirects = 5
+
+# Crawler Settings
+# How the checker explores websites
+[crawlet]
+max_depth = 3
+max_concurrent_requests = 10
+same_domain_only = false
+
+# Checker Settings
+# What links to check and how
+[checker]
+check_external_links = true
+ignore_ssl_errors = false
+retry_attempts = 3
+
+# Output Settings
+# How results are displayed
+[output]
+output_format = "pretty"  # Options: pretty, json, csv
+show_successful = false

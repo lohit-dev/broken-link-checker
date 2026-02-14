@@ -1,0 +1,53 @@
+# BLE
+
+Broken link checker. Crawls a URL or local file, finds links, and reports which are broken (404 or 5xx).
+
+## Install
+
+**From crates.io**
+
+```bash
+cargo install ble
+```
+
+**From source**
+
+```bash
+git clone https://github.com/lohit-dev/broken-link-checker
+cd broken_link_checker
+cargo build --release
+```
+
+Add `target/release` to your `PATH`, or copy `target/release/ble` to a directory already on your `PATH`.
+
+Config: `Settings.toml` (timeouts, redirects, checker options).
+
+## Usage
+
+```
+Usage: ble [OPTIONS] [URL]
+
+Arguments:
+  [URL]
+
+Options:
+  -f, --file <FILE>
+      --timeout-seconds <SECONDS>
+      --max-redirects <COUNT>
+  -d, --max-depth <DEPTH>
+  -c, --max-concurrent-requests <COUNT>
+      --same-domain-only <SAME_DOMAIN_ONLY>          [possible values: true, false]
+      --check-external-links <CHECK_EXTERNAL_LINKS>  [possible values: true, false]
+      --ignore-ssl-errors <IGNORE_SSL_ERRORS>        [possible values: true, false]
+      --retry-attempts <COUNT>
+  -o, --output-format <FORMAT>
+      --show-successful <SHOW_SUCCESSFUL>            [possible values: true, false]
+  -h, --help                                         Print help
+```
+
+## Planned
+
+1. **Parallelism** – concurrent link checks (respecting `max_concurrent_requests`)
+2. **Depth** – recursive crawl with configurable max depth
+3. **Colors / beautification** – improved terminal output
+4. **Optimization** – resource and efficiency improvements

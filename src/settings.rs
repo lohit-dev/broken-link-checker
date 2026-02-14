@@ -49,9 +49,10 @@ pub struct OutputSettings {
     pub show_successful: bool,
 }
 
-#[derive(Debug, PartialEq, Deserialize)]
+#[derive(Debug, PartialEq, Deserialize, Default)]
 #[serde(rename_all = "lowercase")]
 pub enum OutputFormat {
+    #[default]
     Pretty,
     Json,
 }

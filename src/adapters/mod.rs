@@ -1,6 +1,6 @@
 use clap::Parser;
 use core::panic;
-use eyre::{eyre, Context};
+use eyre::{Context, eyre};
 use std::path::PathBuf;
 use url::Url;
 

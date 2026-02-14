@@ -1,5 +1,6 @@
 use clap::Parser;
 use std::path::PathBuf;
+use tracing::error;
 use url::Url;
 
 use crate::core::command::CheckCommand;
@@ -66,16 +67,42 @@ impl From<&Cli> for CheckCommand {
             },
             (None, Some(url_str)) => {
                 let url = Url::parse(url_str).unwrap_or_else(|e| {
-                    eprintln!("Error: Failed to parse URL '{}': {:?}", url_str, e);
+                    error!(url = %url_str, error = ?e, "Failed to parse URL");
                     std::process::exit(1);
                 });
                 CheckCommand::CheckUrl { url }
             }
 
             (None, None) => {
-                eprintln!("Error: Either file or url must be provided");
+                error!("Either file or url must be provided");
                 std::process::exit(1);
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_cli_from_url() {
+        let cli = Cli::parse_from(["ble", "https://web-scraping.dev/"]);
+        assert_eq!(cli.url, Some("https://web-scraping.dev/".to_string()));
+    }
+
+    #[test]
+    fn test_cli_from_url_with_trailing_space() {
+        let cli = Cli::parse_from(["ble", "https://web-scraping.dev/      "]);
+        assert_eq!(cli.url, Some("https://web-scraping.dev/      ".to_string()));
+    }
+
+    #[test]
+    fn test_cli_from_url_with_invalid_url() {
+        let cli = Cli::parse_from(["ble", "https://web-scraping.dev/invalid"]);
+        assert_eq!(
+            cli.url,
+            Some("https://web-scraping.dev/invalid".to_string())
+        );
     }
 }

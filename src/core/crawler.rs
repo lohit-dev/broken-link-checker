@@ -37,3 +37,30 @@ impl Crawler {
         Ok(links)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::sync::Arc;
+
+    use crate::context::AppContext;
+    use crate::settings::Settings;
+
+    use super::*;
+
+    #[tokio::test]
+    async fn test_crawl_already_visited_errors() {
+        let settings = Settings::default();
+        let ctx = Arc::new(AppContext::new(settings));
+        let mut crawler = Crawler::new(ctx);
+        let url = "https://example.com";
+        crawler.visited.insert(url.to_string());
+        let result = crawler.crawl(url).await;
+        assert!(result.is_err());
+        assert!(
+            result
+                .unwrap_err()
+                .to_string()
+                .contains("already been visited")
+        );
+    }
+}

@@ -1,5 +1,6 @@
 use eyre::eyre;
 use scraper::{Html, Selector};
+use tracing::info;
 
 pub struct HtmlParser;
 
@@ -19,12 +20,14 @@ impl HtmlParser {
         let selector = Selector::parse("a")
             .map_err(|e| eyre!("invalid CSS selector for anchor links: {}", e))?;
 
-        let links = document
+        let links: Vec<String> = document
             .select(&selector)
             .filter_map(|element| element.value().attr("href"))
             .map(|s| s.to_string())
             .collect();
 
+        info!(count = links.len(), "Found links");
+        info!("");
         Ok(links)
     }
 }

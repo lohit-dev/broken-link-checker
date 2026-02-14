@@ -1,6 +1,4 @@
 use clap::Parser;
-use core::panic;
-use eyre::{Context, eyre};
 use std::path::PathBuf;
 use url::Url;
 
@@ -67,11 +65,17 @@ impl From<&Cli> for CheckCommand {
                 file: path.to_path_buf(),
             },
             (None, Some(url_str)) => {
-                let url = Url::parse(url_str).wrap_err(eyre!("Failed to parse URL: {}", url_str));
-                CheckCommand::CheckUrl { url: url.unwrap() }
+                let url = Url::parse(url_str).unwrap_or_else(|e| {
+                    eprintln!("Error: Failed to parse URL '{}': {:?}", url_str, e);
+                    std::process::exit(1);
+                });
+                CheckCommand::CheckUrl { url }
             }
 
-            (None, None) => panic!("Either file or url must be provided"),
+            (None, None) => {
+                eprintln!("Error: Either file or url must be provided");
+                std::process::exit(1);
+            }
         }
     }
 }

@@ -1,24 +1,27 @@
-use crate::adapters::{http::HttpClient, parser::HtmlParser};
+use crate::{
+    adapters::{http::HttpClient, parser::HtmlParser},
+    settings::Settings,
+};
 
 pub struct AppContext {
-    pub parser: HtmlParser,
+    pub settings: Settings,
     pub http_client: HttpClient,
-}
-
-impl Default for AppContext {
-    fn default() -> Self {
-        Self::new(
-            10,    // default timeout of 10 seconds
-            false, // do not ignore SSL errors by default
-        )
-    }
+    pub parser: HtmlParser,
 }
 
 impl AppContext {
-    pub fn new(timeout_seconds: u64, ignore_ssl: bool) -> Self {
+    pub fn new(settings: Settings) -> Self {
+        let http_client = HttpClient::new(
+            settings.http.timeout_seconds,
+            settings.http.max_redirects,
+            settings.checker.ignore_ssl_errors,
+        );
+        let parser = HtmlParser::new();
+
         Self {
-            parser: HtmlParser::new(),
-            http_client: HttpClient::new(timeout_seconds, ignore_ssl),
+            settings,
+            http_client,
+            parser,
         }
     }
 }
@@ -27,11 +30,14 @@ impl AppContext {
 mod tests {
     use url::Url;
 
+    use crate::settings::Settings;
+
     use super::*;
 
     #[test]
     fn test_app_context_parser() {
-        let context = AppContext::default();
+        let settings = Settings::default();
+        let context = AppContext::new(settings);
         assert_eq!(
             context
                 .parser
@@ -43,7 +49,9 @@ mod tests {
 
     #[tokio::test]
     async fn test_app_context_http_client() {
-        let context = AppContext::default();
+        let mut settings = Settings::default();
+        settings.http.timeout_seconds = 60;
+        let context = AppContext::new(settings);
         let url = Url::parse("https://www.rust-lang.org").unwrap();
 
         let html = context.http_client.fetch(url.as_str()).await.unwrap();
@@ -55,7 +63,9 @@ mod tests {
 
     #[tokio::test]
     async fn test_app_content_full_flow() {
-        let context = AppContext::default();
+        let mut settings = Settings::default();
+        settings.http.timeout_seconds = 120;
+        let context = AppContext::new(settings);
         let url = Url::parse("https://www.rust-lang.org").unwrap();
 
         let html = context.http_client.fetch(url.as_str()).await.unwrap();

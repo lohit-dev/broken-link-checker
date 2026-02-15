@@ -16,8 +16,6 @@ impl Validator {
         }
     }
 
-    /// Whether to run check_link (HTTP GET) on this URL. When same_domain_only is set we still
-    /// check external links (YouTube, etc.) so we can report broken outbound links; we just don't crawl them.
     pub fn should_check(&self, url: &Url, base: &Url) -> bool {
         if !self.is_checkable(url) {
             return false;
@@ -32,8 +30,6 @@ impl Validator {
         matches!(url.scheme(), "http" | "https")
     }
 
-    /// Whether to follow this link and crawl its page for more links. When same_domain_only is set
-    /// we only enqueue same-domain URLs (no following to scrapfly.io, YouTube, etc.).
     pub fn should_crawl(&self, url: &Url, base: &Url) -> bool {
         if !self.is_checkable(url) {
             return false;

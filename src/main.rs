@@ -1,9 +1,9 @@
 use std::process;
 use std::sync::Arc;
 
-use ble::adapters::Cli;
-use ble::core::command::{CheckCommand, execute_command};
-use ble::{context::AppContext, settings::Settings};
+use broken_link_checker::adapters::Cli;
+use broken_link_checker::core::command::{CheckCommand, execute_command};
+use broken_link_checker::{context::AppContext, settings::Settings};
 use clap::{CommandFactory, Parser};
 use tracing::error;
 use tracing_subscriber::layer::SubscriberExt;

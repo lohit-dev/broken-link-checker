@@ -1,5 +1,5 @@
 [package]
-name = "ble"
+name = "broken-link-checker"
 version = "1.1.0"
 edition = "2024"
 description = "Broken link checker: crawl a URL or local file, find links, report 404 and 5xx"
@@ -7,11 +7,15 @@ readme = "README.md"
 license = "MIT"
 repository = "https://github.com/lohit-dev/broken-link-checker"
 homepage = "https://github.com/lohit-dev/broken-link-checker"
-documentation = "https://docs.rs/ble"
+documentation = "https://docs.rs/broken-link-checker"
 keywords = ["link", "checker", "crawl", "broken-links", "cli"]
 categories = ["command-line-utilities", "web-programming"]
 authors = ["lohit-dev"]
 exclude = ["target", "*.pdb", ".git"]
+
+[[bin]]
+name = "ble"
+path = "src/main.rs"
 
 [dependencies]
 clap = { version = "4.5.58", features = ["derive"] }

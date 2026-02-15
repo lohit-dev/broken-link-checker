@@ -156,4 +156,38 @@ mod tests {
         assert!(is_broken_status(503));
         assert!(is_broken_status(599));
     }
+
+    #[tokio::test]
+    async fn test_check_link_502_broken() {
+        let mock_server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/bad-gateway"))
+            .respond_with(ResponseTemplate::new(502))
+            .mount(&mock_server)
+            .await;
+
+        let client = test_client();
+        let ok = client
+            .check_link(&format!("{}/bad-gateway", mock_server.uri()))
+            .await
+            .unwrap();
+        assert!(!ok);
+    }
+
+    #[tokio::test]
+    async fn test_check_link_503_broken() {
+        let mock_server = MockServer::start().await;
+        Mock::given(method("GET"))
+            .and(path("/unavailable"))
+            .respond_with(ResponseTemplate::new(503))
+            .mount(&mock_server)
+            .await;
+
+        let client = test_client();
+        let ok = client
+            .check_link(&format!("{}/unavailable", mock_server.uri()))
+            .await
+            .unwrap();
+        assert!(!ok);
+    }
 }

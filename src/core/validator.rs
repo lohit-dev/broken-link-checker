@@ -143,4 +143,28 @@ mod tests {
         assert!(v.should_check(&Url::parse("https://example.com/other").unwrap(), &base));
         assert!(!v.should_check(&Url::parse("https://other.com/page").unwrap(), &base));
     }
+
+    #[test]
+    fn test_should_crawl_internal_only_allows_external() {
+        let v = validator_internal_only();
+        let base = Url::parse("https://example.com/page").unwrap();
+        assert!(v.should_crawl(&Url::parse("https://example.com/other").unwrap(), &base));
+        assert!(v.should_crawl(&Url::parse("https://other.com/page").unwrap(), &base));
+    }
+
+    #[test]
+    fn test_same_domain_subdomain() {
+        let v = validator_same_domain_only();
+        let base = Url::parse("https://example.com/page").unwrap();
+        assert!(v.should_crawl(&Url::parse("https://example.com/other").unwrap(), &base));
+        assert!(!v.should_crawl(&Url::parse("https://sub.example.com/page").unwrap(), &base));
+    }
+
+    #[test]
+    fn test_should_check_skips_non_http_schemes() {
+        let v = validator_all();
+        let base = Url::parse("https://example.com/page").unwrap();
+        assert!(!v.should_check(&Url::parse("mailto:a@b.com").unwrap(), &base));
+        assert!(!v.should_check(&Url::parse("ftp://files.example.com/x").unwrap(), &base));
+    }
 }

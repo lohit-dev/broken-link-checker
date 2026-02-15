@@ -55,4 +55,58 @@ mod tests {
         assert_eq!(links[1], "https://rust-lang.org");
         assert_eq!(links[2], "/relative/link");
     }
+
+    #[test]
+    fn test_parse_links_empty_html() {
+        let parser = HtmlParser::new();
+        let links = parser.parse_links("<html><body></body></html>").unwrap();
+        assert!(links.is_empty());
+    }
+
+    #[test]
+    fn test_parse_links_no_anchors() {
+        let parser = HtmlParser::new();
+        let html = r#"<html><body><p>No links here</p><div>Just text</div></body></html>"#;
+        let links = parser.parse_links(html).unwrap();
+        assert!(links.is_empty());
+    }
+
+    #[test]
+    fn test_parse_links_duplicate_hrefs() {
+        let html = r#"
+            <html><body>
+                <a href="https://example.com">One</a>
+                <a href="https://example.com">Two</a>
+            </body></html>
+        "#;
+        let parser = HtmlParser::new();
+        let links = parser.parse_links(html).unwrap();
+        assert_eq!(links.len(), 2);
+        assert_eq!(links[0], "https://example.com");
+        assert_eq!(links[1], "https://example.com");
+    }
+
+    #[test]
+    fn test_parse_links_fragment_and_query() {
+        let html = r#"
+            <html><body>
+                <a href="/path#section">Fragment</a>
+                <a href="/search?q=test">Query</a>
+            </body></html>
+        "#;
+        let parser = HtmlParser::new();
+        let links = parser.parse_links(html).unwrap();
+        assert_eq!(links.len(), 2);
+        assert_eq!(links[0], "/path#section");
+        assert_eq!(links[1], "/search?q=test");
+    }
+
+    #[test]
+    fn test_parse_links_empty_href_omitted() {
+        let html = r#"<html><body><a href="">Empty</a><a>No href</a></body></html>"#;
+        let parser = HtmlParser::new();
+        let links = parser.parse_links(html).unwrap();
+        assert_eq!(links.len(), 1);
+        assert_eq!(links[0], "");
+    }
 }

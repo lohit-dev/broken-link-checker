@@ -105,4 +105,29 @@ mod tests {
             Some("https://web-scraping.dev/invalid".to_string())
         );
     }
+
+    #[test]
+    fn test_cli_from_file() {
+        let cli = Cli::parse_from(["ble", "--file", "index.html"]);
+        assert_eq!(cli.url, None);
+        assert_eq!(cli.file, Some(std::path::PathBuf::from("index.html")));
+    }
+
+    #[test]
+    fn test_cli_output_format() {
+        let cli = Cli::parse_from(["ble", "https://example.com", "--output-format", "json"]);
+        assert_eq!(cli.output_format.as_deref(), Some("json"));
+    }
+
+    #[test]
+    fn test_cli_max_concurrent_requests() {
+        let cli = Cli::parse_from(["ble", "https://example.com", "-c", "32"]);
+        assert_eq!(cli.max_concurrent_requests, Some(32));
+    }
+
+    #[test]
+    fn test_cli_max_depth() {
+        let cli = Cli::parse_from(["ble", "https://example.com", "-d", "2"]);
+        assert_eq!(cli.max_depth, Some(2));
+    }
 }

@@ -58,4 +58,26 @@ mod tests {
         assert!(result.is_ok());
         assert!(result.unwrap().is_empty());
     }
+
+    #[tokio::test]
+    async fn test_crawl_records_visited() {
+        let mock_server = wiremock::MockServer::start().await;
+        let body = r#"<html><body><a href="/a">A</a></body></html>"#;
+        wiremock::Mock::given(wiremock::matchers::method("GET"))
+            .and(wiremock::matchers::path("/"))
+            .respond_with(wiremock::ResponseTemplate::new(200).set_body_string(body))
+            .mount(&mock_server)
+            .await;
+
+        let mut settings = Settings::default();
+        settings.http.timeout_seconds = 30;
+        let ctx = Arc::new(AppContext::new(settings));
+        let mut crawler = Crawler::new(ctx);
+        let url = format!("{}/", mock_server.uri());
+
+        let links = crawler.crawl(&url).await.unwrap();
+        assert_eq!(crawler.visited.len(), 1);
+        assert_eq!(links.len(), 1);
+        assert_eq!(links[0], "/a");
+    }
 }

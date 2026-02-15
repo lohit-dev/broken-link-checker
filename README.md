@@ -1,10 +1,16 @@
 # BLE
 
+[![CI](https://github.com/lohit-dev/broken-link-checker/actions/workflows/ci.yaml/badge.svg)](https://github.com/lohit-dev/broken-link-checker/actions/workflows/ci.yaml) [![Releases](https://img.shields.io/github/v/release/lohit-dev/broken-link-checker?include_prereleases)](https://github.com/lohit-dev/broken-link-checker/releases)
+
 Broken link checker. Crawls a URL or local file, finds links, and reports which are broken (404 or 5xx).
 
 ## Install
 
-**From crates.io**
+**From GitHub Releases** (pre-built binaries)
+
+Download the latest build for your platform from the [Releases](https://github.com/lohit-dev/broken-link-checker/releases/latest) page. On Unix, make the binary executable and add it to your `PATH` if needed.
+
+**From crates.io** (requires Rust)
 
 ```bash
 cargo install ble
@@ -18,7 +24,7 @@ cd broken_link_checker
 cargo build --release
 ```
 
-Add `target/release` to your `PATH`, or copy `target/release/ble` to a directory already on your `PATH`.
+Add `target/release` to your `PATH`, or copy `target/release/ble` (or `ble.exe` on Windows) to a directory already on your `PATH`.
 
 Config: `Settings.toml` (timeouts, redirects, checker options).
 

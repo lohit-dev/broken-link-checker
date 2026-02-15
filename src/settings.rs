@@ -22,13 +22,15 @@ pub struct Settings {
 impl Settings {
     pub fn new() -> eyre::Result<Self> {
         let config = Config::builder()
-            .add_source(File::with_name("Settings"))
+            .add_source(File::with_name("Settings").required(false))
+            .add_source(File::with_name("local.settings").required(false))
             .build()
-            .wrap_err("failed to load config file")?;
+            .wrap_err("failed to load config")?;
 
         config
             .try_deserialize()
             .wrap_err("Failed to deserialize settings")
+            .or_else(|_| Ok(Settings::default()))
     }
 
     pub fn with_cli(mut self, cli: &Cli) -> Self {

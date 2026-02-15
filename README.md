@@ -52,3 +52,7 @@ Options:
 1. **Parallelism** – concurrent link checks (respecting `max_concurrent_requests`)
 2. **Colors / beautification** – improved terminal output
 3. **Optimization** – resource and efficiency improvements
+
+---
+
+License: MIT. For contributing, see [CONTRIBUTING.md](CONTRIBUTING.md).

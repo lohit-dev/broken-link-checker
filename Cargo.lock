@@ -142,7 +142,7 @@ dependencies = [
 
 [[package]]
 name = "broken-link-checker"
-version = "1.1.0"
+version = "1.1.1"
 dependencies = [
  "clap",
  "config",

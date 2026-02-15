@@ -13,8 +13,10 @@ Download the latest build for your platform from the [Releases](https://github.c
 **From crates.io** (requires Rust)
 
 ```bash
-cargo install ble
+cargo install broken-link-checker
 ```
+
+The installed binary is named `ble`.
 
 **From source**
 

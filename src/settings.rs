@@ -2,6 +2,15 @@ use config::{Config, File};
 use eyre::Context;
 use serde::Deserialize;
 
+use crate::adapters::Cli;
+
+/// For each `$src => $path , $convert`: if let Some(v) = $src { $path = ($convert)(v) }.
+macro_rules! apply {
+    ($( $src:expr => $path:expr , $convert:expr );+ $(;)?) => {
+        $( if let Some(v) = $src { $path = ($convert)(v); } )+
+    };
+}
+
 #[derive(Deserialize)]
 pub struct Settings {
     pub http: HttpSettings,
@@ -20,6 +29,23 @@ impl Settings {
         config
             .try_deserialize()
             .wrap_err("Failed to deserialize settings")
+    }
+
+    pub fn with_cli(mut self, cli: &Cli) -> Self {
+        apply!(
+            cli.timeout_seconds => self.http.timeout_seconds, |v| v;
+            cli.max_redirects => self.http.max_redirects, |v| v as u32;
+            cli.max_depth => self.crawlet.max_depth, |v| v as u32;
+            cli.max_concurrent_requests => self.crawlet.max_concurrent_requests, |v| v as u32;
+            cli.same_domain_only => self.crawlet.same_domain_only, |v| v;
+            cli.check_external_links => self.checker.check_external_links, |v| v;
+            cli.ignore_ssl_errors => self.checker.ignore_ssl_errors, |v| v;
+            cli.retry_attempts => self.checker.retry_attempts, |v| v as u32;
+            cli.output_format.as_deref() => self.output.output_format, OutputFormat::from;
+            cli.show_successful => self.output.show_successful, |v| v;
+        );
+
+        self
     }
 }
 
@@ -77,7 +103,7 @@ impl Default for Settings {
             crawlet: CrawletSettings {
                 max_depth: 3,
                 max_concurrent_requests: 10,
-                same_domain_only: false,
+                same_domain_only: true,
             },
             checker: CheckerSettings {
                 check_external_links: true,
@@ -110,7 +136,7 @@ mod tests {
         assert_eq!(settings.http.max_redirects, 5);
         assert_eq!(settings.crawlet.max_depth, 3);
         assert_eq!(settings.crawlet.max_concurrent_requests, 10);
-        assert!(!settings.crawlet.same_domain_only);
+        assert!(settings.crawlet.same_domain_only);
         assert!(settings.checker.check_external_links);
         assert!(settings.checker.ignore_ssl_errors);
         assert_eq!(settings.checker.retry_attempts, 3);
@@ -125,7 +151,7 @@ mod tests {
         assert_eq!(settings.http.max_redirects, 5);
         assert_eq!(settings.crawlet.max_depth, 3);
         assert_eq!(settings.crawlet.max_concurrent_requests, 10);
-        assert!(!settings.crawlet.same_domain_only);
+        assert!(settings.crawlet.same_domain_only);
         assert!(settings.checker.check_external_links);
         assert!(!settings.checker.ignore_ssl_errors);
         assert_eq!(settings.checker.retry_attempts, 3);

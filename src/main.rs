@@ -20,7 +20,7 @@ async fn main() -> eyre::Result<()> {
         process::exit(1);
     }
 
-    let settings = Settings::new()?;
+    let settings = Settings::new()?.with_cli(&cli);
     let ctx = Arc::new(AppContext::new(settings));
     let command = CheckCommand::from(&cli);
     execute_command(ctx, command).await?;

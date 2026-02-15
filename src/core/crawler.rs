@@ -18,7 +18,7 @@ impl Crawler {
 
     pub async fn crawl(&mut self, url: &str) -> Result<Vec<String>> {
         if !self.visited.insert(url.to_string()) {
-            return Err(eyre!("URL {} has already been visited", url));
+            return Ok(Vec::new()); // already crawled this page
         }
 
         let html = self
@@ -48,19 +48,14 @@ mod tests {
     use super::*;
 
     #[tokio::test]
-    async fn test_crawl_already_visited_errors() {
+    async fn test_crawl_already_visited_returns_empty() {
         let settings = Settings::default();
         let ctx = Arc::new(AppContext::new(settings));
         let mut crawler = Crawler::new(ctx);
         let url = "https://example.com";
         crawler.visited.insert(url.to_string());
         let result = crawler.crawl(url).await;
-        assert!(result.is_err());
-        assert!(
-            result
-                .unwrap_err()
-                .to_string()
-                .contains("already been visited")
-        );
+        assert!(result.is_ok());
+        assert!(result.unwrap().is_empty());
     }
 }

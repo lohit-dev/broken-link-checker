@@ -51,8 +51,8 @@ impl HttpClient {
     }
 }
 
-/// Only 404 and 5xx are considered broken. Used by check_link; exposed for tests.
-pub(crate) fn is_broken_status(code: u16) -> bool {
+/// Only 404 and 5xx are considered broken.
+pub fn is_broken_status(code: u16) -> bool {
     code == 404 || (500..600).contains(&code)
 }
 

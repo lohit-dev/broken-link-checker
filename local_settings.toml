@@ -9,7 +9,7 @@ max_redirects = 5
 [crawlet]
 max_depth = 3
 max_concurrent_requests = 10
-same_domain_only = false
+same_domain_only = true
 
 # Checker Settings
 # What links to check and how

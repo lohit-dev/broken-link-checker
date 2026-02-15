@@ -1,6 +1,6 @@
 [package]
 name = "broken-link-checker"
-version = "1.1.0"
+version = "1.1.1"
 edition = "2024"
 description = "Broken link checker: crawl a URL or local file, find links, report 404 and 5xx"
 readme = "README.md"

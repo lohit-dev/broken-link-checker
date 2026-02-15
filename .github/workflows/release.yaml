@@ -5,6 +5,10 @@ on:
     tags:
       - "v*.*.*" # Triggers on version tags like v1.1.0, v2.0.0, etc.
 
+# Add permissions for the GITHUB_TOKEN
+permissions:
+  contents: write
+
 env:
   CARGO_TERM_COLOR: always
 
@@ -91,6 +95,8 @@ jobs:
     name: Create Release
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -100,12 +106,29 @@ jobs:
         with:
           path: ./artifacts
 
+      - name: Display downloaded artifacts
+        run: |
+          echo "Downloaded artifacts:"
+          ls -R ./artifacts
+
+      - name: Check if pre-release
+        id: check-prerelease
+        run: |
+          # Auto-detect pre-release based on tag name
+          # Pre-release if tag contains: alpha, beta, rc, pre, dev, or starts with v0.
+          if [[ "${GITHUB_REF_NAME}" =~ (alpha|beta|rc|pre|dev) ]] || [[ "${GITHUB_REF_NAME}" =~ ^v0\. ]]; then
+            echo "prerelease=true" >> $GITHUB_OUTPUT
+            echo "This is a pre-release: ${GITHUB_REF_NAME}"
+          else
+            echo "prerelease=false" >> $GITHUB_OUTPUT
+            echo "This is a stable release: ${GITHUB_REF_NAME}"
+          fi
+
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: ./artifacts/*/*
           generate_release_notes: true
           draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          prerelease: ${{ steps.check-prerelease.outputs.prerelease }}
+          fail_on_unmatched_files: true
